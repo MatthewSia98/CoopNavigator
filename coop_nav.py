@@ -18,19 +18,19 @@ class CoopNav:
     PROGRAMS = ('Computer Science', 'Data Science', 'Software Eng.', 'Maths')
     APP_SITE = r'https://uozone2.uottawa.ca/apps'
     PROFILE_DIR = rf'C:/Users/{os.getlogin()}/AppData/Local/Google/Chrome/CoopNav Data'
-    PROFILE = 'Profile 4'
+    PROFILE = 'Profile 99'
     EMAIL_ID = 'i0116'
     NEXT_ID = 'idSIButton9'
     PASSWORD_ID = 'i0118'
     MFA_ID = 'idTxtBx_SAOTCC_OTC'
-    SAVED_ACCOUNT = r'//*[@id="tilesHolder"]/div[1]/div/div[1]'
+    SAVED_ACCOUNTS = r'//*[@id="tilesHolder"]/div[1]/div/div[1]'
     STAY_SIGNED_IN = 'idSIButton9'
     NAVIGATOR = r'//*[@id="block-views-application-directory-application-directory-pane"]/section[1]/div/div[3]/ul/li[13]/article/section/h2/a'
     JOBS = r'//*[@id="ctl00_menuContainer_uxMenu"]/nav/ul/li[7]'
     POSTINGS = r'/html/body/div[1]/form/div[2]/div[2]/div/span/nav/ul/li[7]/div/ul/li[1]'
     PROGRAMS_ID = 'ctl00_mainContainer_uxTabs_ctl03_uxAdvSearchPanel_uxSearchProgramsId_uxAvailableText'
     RESULTS_ID = r'ctl00_mainContainer_uxTabs_ctl03_uxAdvSearchPanel_uxSearchProgramsId_uxAvailable'
-    RESULT = r'//*[@id="ctl00_mainContainer_uxTabs_ctl03_uxAdvSearchPanel_uxSearchProgramsId_uxAvailable"]/option[1]'
+    RESULT = r'//*[@id="ctl00_mainContainer_uxTabs_ctl03_uxAdvSearchPanel_uxSearchProgramsId_uxAvailable"]/'
     ARROW_ID = 'ctl00_mainContainer_uxTabs_ctl03_uxAdvSearchPanel_uxSearchProgramsId_uxAddItem'
     CHOSEN = r'//*[@id="ctl00_mainContainer_uxTabs_ctl03_uxAdvSearchPanel_uxSearchProgramsId_uxSelected"]/'
     SEARCH_ID = 'ctl00_mainContainer_uxTabs_ctl03_uxBasicSearch'
@@ -50,8 +50,8 @@ class CoopNav:
         
     def login(self):
         if self.driver.current_url != CoopNav.APP_SITE:
-            found_saved_accounts = self.driver.find_elements((By.XPAT, CoopNav.SAVED_ACCOUNTS))
-            if len(found_saved_accounts > 0):
+            found_saved_accounts = self.driver.find_elements(By.XPATH, CoopNav.SAVED_ACCOUNTS)
+            if len(found_saved_accounts) > 0:
                 self.wait.until(EC.visibility_of_element_located((By.XPATH, CoopNav.SAVED_ACCOUNT))).click()
             else:
                 email_box = self.wait.until(EC.visibility_of_element_located((By.ID, CoopNav.EMAIL_ID)))
@@ -83,13 +83,14 @@ class CoopNav:
             time.sleep(1)
 
             sel = Select(self.wait.until(EC.presence_of_element_located((By.ID, CoopNav.RESULTS_ID))))
+
             for option in sel.options:
                 option.click()
-    
-            time.sleep(1)
-            
+
             self.wait.until(EC.element_to_be_clickable((By.ID, CoopNav.ARROW_ID))).click()
+
             self.wait.until(EC.visibility_of_element_located((By.XPATH, CoopNav.CHOSEN + f'option[{i+1}]')))
+            self.wait.until(EC.presence_of_element_located((By.XPATH, CoopNav.CHOSEN + f'option[{i+1}]')))
 
         self.wait.until(EC.element_to_be_clickable((By.ID, CoopNav.SEARCH_ID))).click()
 
@@ -107,3 +108,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    #pass
