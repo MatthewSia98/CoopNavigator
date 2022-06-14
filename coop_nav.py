@@ -36,6 +36,7 @@ class CoopNav:
     SEARCH_ID = 'ctl00_mainContainer_uxTabs_ctl03_uxBasicSearch'
     ITEMS_ID = 'ctl00_mainContainer_uxTabs_ctl06_ctl00_ctl00_uxPgSz'
     ITEMS_2500 = r'//*[@id="ctl00_mainContainer_uxTabs_ctl06_ctl00_ctl00_uxPgSz"]/option[5]'
+    WAIT_ID = r'ctl00_mainContainer_UpdateProgress1_uxUpdateText'
     
     def __init__(self):
         options = Options()
@@ -80,8 +81,8 @@ class CoopNav:
             search = self.wait.until(EC.visibility_of_element_located((By.ID, CoopNav.PROGRAMS_ID)))
             search.clear()
             search.send_keys(program + '\n')
-            time.sleep(1)
-
+            
+            self.wait.until(EC.invisibility_of_element_located((By.ID, CoopNav.WAIT_ID)))
             sel = Select(self.wait.until(EC.presence_of_element_located((By.ID, CoopNav.RESULTS_ID))))
 
             for option in sel.options:
@@ -89,6 +90,7 @@ class CoopNav:
 
             self.wait.until(EC.element_to_be_clickable((By.ID, CoopNav.ARROW_ID))).click()
 
+            self.wait.until(EC.invisibility_of_element_located((By.ID, CoopNav.WAIT_ID)))
             self.wait.until(EC.visibility_of_element_located((By.XPATH, CoopNav.CHOSEN + f'option[{i+1}]')))
             self.wait.until(EC.presence_of_element_located((By.XPATH, CoopNav.CHOSEN + f'option[{i+1}]')))
 
