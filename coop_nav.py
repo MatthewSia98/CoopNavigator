@@ -16,6 +16,8 @@ import pyotp
 
 class CoopNav:
     PROGRAMS = ('Computer Science', 'Data Science', 'Software Eng.', 'Maths')
+    JOB_LENGTH = 4
+    WORK_MODELS = ('From Home', 'Hybrid', 'Student preference')
     APP_SITE = r'https://uozone2.uottawa.ca/apps'
     PROFILE_DIR = rf'C:/Users/{os.getlogin()}/AppData/Local/Google/Chrome/CoopNav Data'
     PROFILE = 'Profile 99'
@@ -37,6 +39,8 @@ class CoopNav:
     ITEMS_ID = 'ctl00_mainContainer_uxTabs_ctl06_ctl00_ctl00_uxPgSz'
     ITEMS_2500 = r'//*[@id="ctl00_mainContainer_uxTabs_ctl06_ctl00_ctl00_uxPgSz"]/option[5]'
     WAIT_ID = r'ctl00_mainContainer_UpdateProgress1_uxUpdateText'
+    MONTHS_ID = r'ctl00_mainContainer_uxTabs_ctl03_uxAdvSearchPanel_uxSearchJobLength'
+    MODELS_ID = r'ctl00_mainContainer_uxTabs_ctl03_uxAdvSearchPanel_uxSearchWorkModels'
     
     def __init__(self):
         options = Options()
@@ -91,23 +95,43 @@ class CoopNav:
             self.wait.until(EC.element_to_be_clickable((By.ID, CoopNav.ARROW_ID))).click()
 
             self.wait.until(EC.invisibility_of_element_located((By.ID, CoopNav.WAIT_ID)))
-            self.wait.until(EC.visibility_of_element_located((By.XPATH, CoopNav.CHOSEN + f'option[{i+1}]')))
-            self.wait.until(EC.presence_of_element_located((By.XPATH, CoopNav.CHOSEN + f'option[{i+1}]')))
 
+    def set_job_length(self, n):
+        sel = Select(self.wait.until(EC.element_to_be_clickable((By.ID, CoopNav.MONTHS_ID))))
+
+        for option in sel.options:
+            if int(option.get_attribute('value')) == n:
+                option.click()
+
+        self.wait.until(EC.invisibility_of_element_located((By.ID, CoopNav.WAIT_ID)))
+
+    def set_work_models(self, *work_models):
+        sel = Select(self.wait.until(EC.visibility_of_element_located((By.ID, CoopNav.MODELS_ID))))
+
+        for option in sel.options:
+            if option.text in work_models:
+                ActionChains(self.driver).key_down(Keys.CONTROL).click(option).perform()
+
+        self.wait.until(EC.invisibility_of_element_located((By.ID, CoopNav.WAIT_ID)))
+
+    def submit_options(self):
         self.wait.until(EC.element_to_be_clickable((By.ID, CoopNav.SEARCH_ID))).click()
 
     def show_all_items(self):
         self.wait.until(EC.element_to_be_clickable((By.ID, CoopNav.ITEMS_ID))).click()
         self.wait.until(EC.element_to_be_clickable((By.XPATH, CoopNav.ITEMS_2500))).click()
 
+
 def main():        
     cv = CoopNav()
     cv.login()    
     cv.open_navigator()
     cv.search_for_programs(*CoopNav.PROGRAMS)
+    cv.set_job_length(CoopNav.JOB_LENGTH)
+    cv.set_work_models(*CoopNav.WORK_MODELS)
+    cv.submit_options()
     cv.show_all_items()
 
 
 if __name__ == '__main__':
     main()
-    #pass
